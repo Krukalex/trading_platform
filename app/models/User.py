@@ -13,14 +13,11 @@ class User:
         if isinstance(account, Account):
             self.account_id = account.account_id
 
-    def setUsername(self, name: str):
+    def set_username(self, name: str):
         self.username = name
-
-    def getUsername(self):
+    def get_username(self):
         return self.username
-
-    def setEmail(self, email: str):
-        self.email = email
-                 
-    def getEmail(self):
+    def set_email(self, email: str):
+        self.email = email      
+    def get_email(self):
         return self.email
