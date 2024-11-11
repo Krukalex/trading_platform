@@ -1,4 +1,4 @@
-from app.models import User, Account
+from app.models import User, Account, Portfolio, Stock
 
 alex = User("Alex", "Alex@example.com")
 alex_account = Account(alex)
@@ -6,14 +6,11 @@ alex_account = Account(alex)
 mike = User("Mike", "Mike@example.com")
 mike_account = Account(mike)
 
-if __name__ == "__main__":
-    print(alex.get_username())
-    print(alex.get_email())
-    print(f"User ID: {alex.user_id}")
-    print(f"Account ID: {alex_account.account_id}")
-    print(f"User ID for account: {alex_account.user_id}")
-    print(f"Alex has an account with ID: {alex.account_id}")
+alex_portfolio = Portfolio(alex_account)
 
+aapl = Stock("Apple", "AAPL", 100)
+
+if __name__ == "__main__":
     alex_account.deposit(100)
     alex_account.deposit(200)
 
@@ -29,4 +26,12 @@ if __name__ == "__main__":
     alex_account.get_transaction_history()
 
     mike_account.get_transaction_history()
+
+    alex_portfolio.buy_stock(aapl, 5)
+
+    alex_account.deposit(300)
+
+    alex_portfolio.buy_stock(aapl, 2)
+
+    alex_portfolio.get_holdings()
     # app.run(debug=True)
