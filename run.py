@@ -34,4 +34,7 @@ if __name__ == "__main__":
     alex_portfolio.buy_stock(aapl, 2)
 
     alex_portfolio.get_holdings()
+
+    alex_account.get_transaction_history()
+    alex_account.get_trade_history()
     # app.run(debug=True)

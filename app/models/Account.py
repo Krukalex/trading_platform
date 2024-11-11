@@ -10,6 +10,7 @@ class Account:
         self.trade_fee_rate = 0.01
         user.link_account(self)
         self.transaction_history = []
+        self.trade_history = []
 
     def get_balance(self):
         return self.balance
@@ -102,3 +103,8 @@ class Account:
         print(f"Transaction history for {self.user_id}")
         for transaction in self.transaction_history:
             print(transaction)
+        
+    def get_trade_history(self):
+        print(f"Trade history for {self.user_id}")
+        for trade in self.trade_history:
+            print(trade)

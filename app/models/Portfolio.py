@@ -1,7 +1,11 @@
 from app.models import Account, Stock
+from app.models.Trade import Trade
+
+import uuid
 
 class Portfolio:
     def __init__(self, account:Account):
+        self.portfolio_id = uuid.uuid1()
         self.account_id = account.get_account_id()
         self.user_id = account.get_user_id()
         self.holdings = {}
@@ -40,10 +44,16 @@ class Portfolio:
 
         self.account.apply_trade_fee(total_price)
         self.account.deduct_balance(total_price)
+
+        trade = Trade(
+            trade_type="Stock Purchase",
+            stock=stock,
+            quantity=quantity,
+            new_balance=self.account.get_balance()
+        )
+        self.account.trade_history.append(trade)
         print(f"Purchased {quantity} shares of {stock.ticker} for a price of {total_price}. Account balance is {self.account.get_balance()}")
         return True
 
     def get_holdings(self):
         print(self.holdings)
-
-
