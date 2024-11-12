@@ -23,10 +23,12 @@ class Portfolio:
         return self.user_id
     def add_value(self, amount:float):
         self.total_value+=amount
+    def deduct_value(self, amount:float):
+        self.total_value-=amount
     
     def buy_stock(self, stock:Stock, quantity:int=1)->bool:
-        total_price = quantity * stock.get_price()
-        trade_fee = total_price * self.account.trade_fee_rate
+        total_price = round(quantity * stock.get_price(),2)
+        trade_fee = round(total_price * self.account.trade_fee_rate,2)
 
         if total_price+trade_fee>self.account.get_balance():
             print(f"Insufficent funds, attempting to make purches for {total_price}. Account balance is {self.account.get_balance()}")
@@ -49,10 +51,41 @@ class Portfolio:
             trade_type="Stock Purchase",
             stock=stock,
             quantity=quantity,
+            trade_fee=trade_fee,
             new_balance=self.account.get_balance()
         )
         self.account.trade_history.append(trade)
-        print(f"Purchased {quantity} shares of {stock.ticker} for a price of {total_price}. Account balance is {self.account.get_balance()}")
+        print(f"Purchased {quantity} shares of {stock.ticker} for a price of {total_price} plus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
+        return True
+    
+    def sell_stock(self, stock:Stock, quantity:int = 1):
+        total_profit = round(quantity * stock.get_price(),2)
+        trade_fee = round(total_profit * self.account.trade_fee_rate,2)
+
+        if stock.ticker not in self.holdings:
+            print(f"You do not currently own {stock.company_name} stock. This sale is invalid")
+            return False
+        elif quantity>self.holdings[stock.ticker]['quantity']:
+            print(f"You are attempting to sells {quantity} shares of {stock.ticker}, but you only are holding {self.holdings[stock.ticker]['quantity']} shares. This sale is invalid")
+            return False
+        else:
+            self.holdings[stock.ticker]["value"]-=(total_profit)
+            self.holdings[stock.ticker]["quantity"]-=quantity
+
+        self.deduct_value(total_profit)
+
+        self.account.apply_trade_fee(total_profit)
+        self.account.add_balance(total_profit)
+
+        trade = Trade(
+            trade_type="Stock Sale",
+            stock=stock,
+            quantity=quantity,
+            trade_fee=trade_fee,
+            new_balance=self.account.get_balance()
+        )
+        self.account.trade_history.append(trade)
+        print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
 
     def get_holdings(self):

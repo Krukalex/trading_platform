@@ -13,7 +13,7 @@ class Account:
         self.trade_history = []
 
     def get_balance(self):
-        return self.balance
+        return round(self.balance,2)
     def set_balance(self, amount:float):
         if amount<0:
             print("Amount cannot be negative")
@@ -87,7 +87,7 @@ class Account:
             print(f"Transfer was received for the amount {amount}. New balance is {destination.get_balance()}")
 
     def apply_trade_fee(self, amount:float):
-        fee = amount*self.trade_fee_rate
+        fee = round(amount*self.trade_fee_rate,2)
         self.deduct_balance(fee)
 
         transaction = Transaction(
