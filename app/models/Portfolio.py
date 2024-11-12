@@ -1,4 +1,4 @@
-from app.models import Account, Stock
+from app.models import Account, Stock, Order
 from app.models.Trade import Trade
 
 import uuid
@@ -87,6 +87,13 @@ class Portfolio:
         self.account.trade_history.append(trade)
         print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
+    
+    def create_order(self, stock:Stock, quantity:int, order_type:str):
+        order = Order(
+            order_type=order_type,
+            stock=stock,
+            quantity=quantity
+        )
 
     def get_holdings(self):
         print(self.holdings)
