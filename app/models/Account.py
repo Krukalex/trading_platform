@@ -11,6 +11,7 @@ class Account:
         user.link_account(self)
         self.transaction_history = []
         self.trade_history = []
+        self.order_history = {}
 
     def get_balance(self):
         return round(self.balance,2)
@@ -108,3 +109,8 @@ class Account:
         print(f"Trade history for {self.user_id}")
         for trade in self.trade_history:
             print(trade)
+        
+    def get_order_history(self):
+        print(f"Order history for {self.account_id}")
+        for order in self.order_history.values():
+            print(order)

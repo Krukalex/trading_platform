@@ -33,18 +33,20 @@ if __name__ == "__main__":
 
     alex_account.deposit(1000)
 
-    alex_portfolio.buy_stock(aapl, 2)
+    # alex_portfolio.buy_stock(aapl, 2)
     alex_portfolio.buy_stock(msft, 4)
 
+    # alex_portfolio.get_holdings()
+
+    # alex_account.get_transaction_history()
+    # alex_account.get_trade_history()
+
+    # alex_portfolio.sell_stock(msft, 6)
+    # alex_portfolio.sell_stock(msft, 2)
+
+    alex_portfolio.create_order(msft, 2, "market order", "sell")
     alex_portfolio.get_holdings()
-
-    alex_account.get_transaction_history()
     alex_account.get_trade_history()
-
-    alex_portfolio.sell_stock(msft, 6)
-    alex_portfolio.sell_stock(msft, 2)
-
-    alex_portfolio.get_holdings()
-    alex_account.get_trade_history()
+    alex_account.get_order_history()
     print(".........................End.........................")
     # app.run(debug=True)

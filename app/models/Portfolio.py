@@ -1,5 +1,7 @@
-from app.models import Account, Stock, Order
+from app.models import Account, Stock
 from app.models.Trade import Trade
+from app.models.Order import Order
+from app.models.OrderProcessor import OrderProcessor
 
 import uuid
 
@@ -88,12 +90,15 @@ class Portfolio:
         print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
     
-    def create_order(self, stock:Stock, quantity:int, order_type:str):
+    def create_order(self, stock:Stock, quantity:int, order_type:str, action:str):
         order = Order(
             order_type=order_type,
+            action=action,
             stock=stock,
             quantity=quantity
         )
+        processor = OrderProcessor(self.account, self)
+        processor.process_order(order)
 
     def get_holdings(self):
         print(self.holdings)

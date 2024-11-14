@@ -5,3 +5,4 @@ from .Portfolio import Portfolio
 from .Stock import Stock
 from .Trade import Trade
 from .Order import Order
+from .OrderProcessor import OrderProcessor
