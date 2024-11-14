@@ -1,6 +1,6 @@
 from app.models import Account, Stock
 from app.models.Trade import Trade
-from app.models.Order import Order
+from app.models.Order import Order, OrderType, OrderAction
 from app.models.OrderProcessor import OrderProcessor
 
 import uuid
@@ -13,6 +13,7 @@ class Portfolio:
         self.holdings = {}
         self.total_value = 0
         self.account = account
+        self.pending_orders = {}
 
     
     def get_total_value(self):
@@ -90,7 +91,7 @@ class Portfolio:
         print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
     
-    def create_order(self, stock:Stock, quantity:int, order_type:str, action:str):
+    def create_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction):
         order = Order(
             order_type=order_type,
             action=action,

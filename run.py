@@ -1,4 +1,5 @@
 from app.models import User, Account, Portfolio, Stock
+from app.models.Order import OrderAction, OrderType
 
 alex = User("Alex", "Alex@example.com")
 alex_account = Account(alex)
@@ -44,7 +45,7 @@ if __name__ == "__main__":
     # alex_portfolio.sell_stock(msft, 6)
     # alex_portfolio.sell_stock(msft, 2)
 
-    alex_portfolio.create_order(msft, 2, "market order", "sell")
+    alex_portfolio.create_order(msft, 2, OrderType.MARKET, OrderAction.SELL)
     alex_portfolio.get_holdings()
     alex_account.get_trade_history()
     alex_account.get_order_history()
