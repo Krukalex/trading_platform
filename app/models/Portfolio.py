@@ -1,6 +1,6 @@
 from app.models import Account, Stock
 from app.models.Trade import Trade
-from app.models.Order import Order, OrderType, OrderAction
+from app.models.Order import Order, OrderType, OrderAction, MarketOrder, StopOrder, LimitOrder
 from app.models.OrderProcessor import OrderProcessor
 
 import uuid
@@ -91,15 +91,30 @@ class Portfolio:
         print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
     
-    def create_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction):
-        order = Order(
+    def create_market_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction):
+        order = MarketOrder(
             order_type=order_type,
             action=action,
             stock=stock,
             quantity=quantity
         )
+        self.account.order_history[order.order_id] = order
+        self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
-        processor.process_order(order)
+        processor.process_market_order(order)
+
+    def create_stop_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, stop:float):
+        order = StopOrder(
+            order_type=order_type,
+            action=action,
+            stock=stock,
+            stop=stop,
+            quantity=quantity
+        )
+        self.account.order_history[order.order_id] = order
+        self.pending_orders[order.order_id] = order
+        processor = OrderProcessor(self.account, self)
+        processor.process_stop_order(order)
 
     def get_holdings(self):
         print(self.holdings)

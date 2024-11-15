@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # alex_portfolio.sell_stock(msft, 6)
     # alex_portfolio.sell_stock(msft, 2)
 
-    alex_portfolio.create_order(msft, 2, OrderType.MARKET, OrderAction.SELL)
+    alex_portfolio.create_stop_order(msft, 2, OrderType.STOP, OrderAction.BUY, stop=140)
     alex_portfolio.get_holdings()
     alex_account.get_trade_history()
     alex_account.get_order_history()
