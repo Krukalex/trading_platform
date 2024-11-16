@@ -2,6 +2,7 @@ from app.models import Account, Stock
 from app.models.Trade import Trade
 from app.models.Order import Order, OrderType, OrderAction, MarketOrder, StopOrder, LimitOrder
 from app.models.OrderProcessor import OrderProcessor
+import threading
 
 import uuid
 
@@ -14,6 +15,7 @@ class Portfolio:
         self.total_value = 0
         self.account = account
         self.pending_orders = {}
+        self.lock = threading.Lock()
 
     
     def get_total_value(self):
@@ -99,7 +101,8 @@ class Portfolio:
             quantity=quantity
         )
         self.account.order_history[order.order_id] = order
-        self.pending_orders[order.order_id] = order
+        with self.lock:
+            self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         processor.process_market_order(order)
 
@@ -112,7 +115,8 @@ class Portfolio:
             quantity=quantity
         )
         self.account.order_history[order.order_id] = order
-        self.pending_orders[order.order_id] = order
+        with self.lock:
+            self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         processor.process_stop_order(order)
 
