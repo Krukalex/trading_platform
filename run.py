@@ -1,5 +1,6 @@
 from app.models import User, Account, Portfolio, Stock
 from app.models.Order import OrderAction, OrderType
+from app.models.OrderProcessor import OrderProcessor
 
 alex = User("Alex", "Alex@example.com")
 alex_account = Account(alex)
@@ -12,42 +13,14 @@ alex_portfolio = Portfolio(alex_account)
 aapl = Stock("Apple", "AAPL", 100)
 msft = Stock("Microsoft", "MSFT", 120)
 
+processor = OrderProcessor(alex_account, alex_portfolio)
+processor.procces_order_queue()
+
 if __name__ == "__main__":
     print(".........................Running.........................")
-    # alex_account.deposit(100)
-    # alex_account.deposit(200)
 
-    # alex_account.withdraw(500)
-    # alex_account.withdraw(200)
-    # alex_account.withdraw(100)
-
-    # alex_account.transfer(mike_account, 50)
-
-    # print(mike_account.get_balance())
-
-
-    # alex_account.get_transaction_history()
-
-    # mike_account.get_transaction_history()
-
-    # alex_portfolio.buy_stock(aapl, 5)
-
-    alex_account.deposit(1000)
-
-    # alex_portfolio.buy_stock(aapl, 2)
-    alex_portfolio.buy_stock(msft, 4)
-
-    # alex_portfolio.get_holdings()
-
-    # alex_account.get_transaction_history()
-    # alex_account.get_trade_history()
-
-    # alex_portfolio.sell_stock(msft, 6)
-    # alex_portfolio.sell_stock(msft, 2)
 
     alex_portfolio.create_stop_order(msft, 2, OrderType.STOP, OrderAction.BUY, stop=140)
-    alex_portfolio.get_holdings()
-    alex_account.get_trade_history()
-    alex_account.get_order_history()
+
     print(".........................End.........................")
     # app.run(debug=True)
