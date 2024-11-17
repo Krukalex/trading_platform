@@ -30,13 +30,13 @@ if __name__ == "__main__":
     print(".........................Running.........................")
     signal.signal(signal.SIGINT, signal_handler)
 
-    alex_portfolio.create_stop_order(msft, 2, OrderType.STOP, OrderAction.BUY, stop=140)
+    alex_portfolio.create_limit_order(msft, 2, OrderType.LIMIT, OrderAction.BUY, limit=100)
 
     try:
         while True:
             # This will keep the main thread alive, allowing background threads to run
             time.sleep(1)
-            msft.set_price(150)
+            msft.set_price(90)
             alex_account.get_order_history()
             if not alex_portfolio.pending_orders:
                 alex_portfolio.create_market_order(aapl, 3, OrderType.MARKET, OrderAction.BUY)

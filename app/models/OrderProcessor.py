@@ -24,14 +24,14 @@ class OrderProcessor:
     
     def process_stop_order(self, order:Order):
         if order.action == OrderAction.BUY:
-            if order.stock.get_price()>order.stop:
+            if order.stock.get_price()>=order.stop:
                 result = self.portfolio.buy_stock(order.stock, order.quantity)
             else:
                 #need to add order to a queue that polls the stock price on a scheduled basis
                 result = None
-                print("Sell stop order not executed since stock was not above the required price")
+                print("Buy stop order not executed since stock was not above the required price")
         elif order.action == OrderAction.SELL:
-            if order.stock.get_price()<order.stop:
+            if order.stock.get_price()<=order.stop:
                 result = self.portfolio.sell_stock(order.stock, order.quantity)
             else:
                 result = None
@@ -46,7 +46,25 @@ class OrderProcessor:
         return False
     
     def process_limit_order(self, order:Order):
-        return
+        if order.action == OrderAction.BUY:
+            if order.stock.get_price()<=order.limit:
+                result = self.portfolio.buy_stock(order.stock, order.quantity)
+            else:
+                result = None
+                print("Buy limit order not executed since stock price was above the limit price")
+        elif order.action == OrderAction.SELL:
+            if order.stock.get_price()>=order.limit:
+                result = self.portfolio.buy_stock(order.stock, order.quantity)
+            else:
+                result = None
+                print("Sell limit order not executed since stock price was below the limit price")
+        if result:
+            order.set_status(OrderStatus.FILLED)
+            with self.lock:
+                del self.portfolio.pending_orders[order.order_id]
+                print(f"Deleted order {order.order_id}. Remaining orders: {self.portfolio.pending_orders}")
+            return True
+        return False
     
     def process_stop_loss(self, order:Order):
         return
