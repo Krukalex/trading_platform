@@ -24,8 +24,6 @@ class OrderProcessor:
     
     def process_stop_order(self, order:Order):
         if order.action == OrderAction.BUY:
-            print(order.stock.get_price())
-            print(order.stop)
             if order.stock.get_price()>order.stop:
                 result = self.portfolio.buy_stock(order.stock, order.quantity)
             else:
@@ -40,8 +38,10 @@ class OrderProcessor:
                 print("Sell stop order not executed since stock did not drop below the required price")
         if result:
             order.set_status(OrderStatus.FILLED)
+            print(f"Thread {threading.current_thread().name} attempting to acquire lock...")
             with self.lock:
                 del self.portfolio.pending_orders[order.order_id]
+                print(f"Deleted order {order.order_id}. Remaining orders: {self.portfolio.pending_orders}")
             return True
         return False
     
@@ -53,19 +53,20 @@ class OrderProcessor:
     
     def procces_order_queue(self):
         def process_queue():
+            to_remove = []
             with self.lock:
-                for identifier, order in self.portfolio.pending_orders.items():
-                    print(order.order_type)
-                    print(order.stock.price)
-                    print(order.stop)
-                    if order.order_type == OrderType.STOP:
-                        if order.stock.price > order.stop:
-                            self.process_stop_order(order)
-                    if order.order_type == OrderType.LIMIT:
-                        if order.stock.price < order.limit:
-                            self.process_limit_order(order)
+                orders_copy = list(self.portfolio.pending_orders.items())
+            
+            for identifier, order in orders_copy:
+                if order.order_type == OrderType.STOP:
+                    if order.stock.price > order.stop:
+                        self.process_stop_order(order)
+                        to_remove.append(identifier)
+                if order.order_type == OrderType.LIMIT:
+                    if order.stock.price < order.limit:
+                        self.process_limit_order(order)
         
-        def run_processor(interval = 10):
+        def run_processor(interval = 3):
             if self.running:
                 process_queue()
                 timer = threading.Timer(interval, run_processor)

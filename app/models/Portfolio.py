@@ -15,7 +15,7 @@ class Portfolio:
         self.total_value = 0
         self.account = account
         self.pending_orders = {}
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
     
     def get_total_value(self):
