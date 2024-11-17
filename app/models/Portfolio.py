@@ -15,7 +15,7 @@ class Portfolio:
         self.total_value = 0
         self.account = account
         self.pending_orders = {}
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
     
     def get_total_value(self):
@@ -119,6 +119,20 @@ class Portfolio:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         processor.process_stop_order(order)
+
+    def create_limit_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, limit:float):
+        order = LimitOrder(
+            order_type=order_type,
+            action=action,
+            stock=stock,
+            limit=limit,
+            quantity=quantity
+        )
+        self.account.order_history[order.order_id] = order
+        with self.lock:
+            self.pending_orders[order.order_id] = order
+        processor = OrderProcessor(self.account, self)
+        processor.process_limit_order(order)
 
     def get_holdings(self):
         print(self.holdings)
