@@ -104,7 +104,9 @@ class Portfolio:
         with self.lock:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
+        print(f"created a market order to {action.name} {quantity} shares of {stock.ticker}")
         processor.process_market_order(order)
+        return True
 
     def create_stop_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, stop:float):
         order = StopOrder(
@@ -118,7 +120,9 @@ class Portfolio:
         with self.lock:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
+        print(f"created a stop  order to {action.name} {quantity} shares of {stock.ticker} with a stop set at {stop}")
         processor.process_stop_order(order)
+        return True
 
     def create_limit_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, limit:float):
         order = LimitOrder(
@@ -132,7 +136,9 @@ class Portfolio:
         with self.lock:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
+        print(f"created a limit order to {action.name} {quantity} shares of {stock.ticker} with a limit set at {limit}")
         processor.process_limit_order(order)
+        return True
 
     def get_holdings(self):
         print(self.holdings)
