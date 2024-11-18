@@ -1,5 +1,8 @@
+import uuid
+
 class Stock:
     def __init__(self, company_name:str, ticker:str, price:float):
+        self.stock_id = uuid.uuid4()
         self.company_name = company_name
         self.ticker = ticker
         self.price = price
