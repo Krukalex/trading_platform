@@ -1,4 +1,4 @@
-from app.models import Account, Stock
+from app.models import Account, Stock, StockManager
 from app.models.Trade import Trade
 from app.models.Order import Order, OrderType, OrderAction, MarketOrder, StopOrder, LimitOrder
 from app.models.OrderProcessor import OrderProcessor
@@ -7,7 +7,7 @@ import threading
 import uuid
 
 class Portfolio:
-    def __init__(self, account:Account):
+    def __init__(self, account:Account, stock_manager:StockManager):
         self.portfolio_id = uuid.uuid1()
         self.account_id = account.get_account_id()
         self.user_id = account.get_user_id()
@@ -15,7 +15,8 @@ class Portfolio:
         self.total_value = 0
         self.account = account
         self.pending_orders = {}
-        self.lock = threading.RLock()
+        self.stock_manager = stock_manager
+        self.lock = stock_manager.lock
 
     
     def get_total_value(self):
@@ -93,7 +94,8 @@ class Portfolio:
         print(f"Sold {quantity} shares of {stock.ticker} for a profit of {total_profit} minus a trade fee of {trade_fee}. Account balance is {self.account.get_balance()}")
         return True
     
-    def create_market_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction):
+    def create_market_order(self, ticker:str, quantity:int, order_type:OrderType, action:OrderAction):
+        stock = self.stock_manager.get_stock(ticker)
         order = MarketOrder(
             order_type=order_type,
             action=action,
@@ -108,7 +110,8 @@ class Portfolio:
         processor.process_market_order(order)
         return True
 
-    def create_stop_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, stop:float):
+    def create_stop_order(self, ticker:str, quantity:int, order_type:OrderType, action:OrderAction, stop:float):
+        stock = self.stock_manager.get_stock(ticker)
         order = StopOrder(
             order_type=order_type,
             action=action,
@@ -124,7 +127,8 @@ class Portfolio:
         processor.process_stop_order(order)
         return True
 
-    def create_limit_order(self, stock:Stock, quantity:int, order_type:OrderType, action:OrderAction, limit:float):
+    def create_limit_order(self, ticker:str, quantity:int, order_type:OrderType, action:OrderAction, limit:float):
+        stock = self.stock_manager.get_stock(ticker)
         order = LimitOrder(
             order_type=order_type,
             action=action,
