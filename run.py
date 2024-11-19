@@ -1,27 +1,17 @@
-from app.models import User, Account, Portfolio, Stock
+from app.models import User, Account, Portfolio, Stock, StockManager
 from app.models.Order import OrderAction, OrderType
 from app.models.OrderProcessor import OrderProcessor
-from data.stock_dict import stock_dict
+from app.models.StockManager import StockManager
 import time
 import signal
 import logging
 
 alex = User("Alex", "Alex@example.com")
+stock_manager = StockManager()
 alex_account = Account(alex)
 alex_account.deposit(1000)
-alex_portfolio = Portfolio(alex_account)
+alex_portfolio = Portfolio(alex_account, stock_manager)
 
-def get_stock(ticker:str):
-    if ticker not in stock_dict:
-        print("this stock is not in the database")
-        return
-    return stock_dict[ticker.upper()]
-
-def update_stock_price(ticker:str, new_price:float):
-    if ticker not in stock_dict:
-        print("This ticker is not in the database")
-        return
-    stock_dict[ticker.upper()].set_price(new_price)
 
 def process_user_input():
     action = input("What would you like to do: trade, get_balance, get_stock_price? ").upper()
@@ -35,7 +25,7 @@ def process_user_input():
         return
     elif action == "GET_STOCK_PRICE":
         ticker = input("choose a ticker to get the price for. ").upper()
-        stock = get_stock(ticker)
+        stock = stock_manager.get_stock(ticker)
         print(f"The current price of {stock.ticker} is {stock.price}")
         return
         
@@ -56,11 +46,10 @@ def buy_sell_stock():
         print("Invalid input for quantity. Please enter a valid number.")
         return
 
-    stock = input("Which stock would you like to choose? (e.g., AAPL, MSFT): ").upper()
+    ticker = input("Which stock would you like to choose? (e.g., AAPL, MSFT): ").upper()
 
-    selected_stock = get_stock(stock)
-    if selected_stock is None:
-        print(f"Stock symbol {stock} not found. Please try again.")
+    if ticker is None:
+        print(f"Stock symbol {ticker} not found. Please try again.")
         return
     
     order_type = input("What type of order would you like to make? (MARKET/STOP/LIMIT): ").upper()
@@ -83,18 +72,18 @@ def buy_sell_stock():
     # Call create_order with the gathered information
     if action == "BUY":
         if order_type == "MARKET":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.MARKET, OrderAction.BUY)
+            alex_portfolio.create_market_order(ticker, quantity, OrderType.MARKET, OrderAction.BUY)
         elif order_type == "STOP":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.STOP, OrderAction.BUY, stop_price)
+            alex_portfolio.create_stop_order(ticker, quantity, OrderType.STOP, OrderAction.BUY, stop_price)
         elif order_type == "LIMIT":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.LIMIT, OrderAction.BUY, stop_price)
+            alex_portfolio.create_limit_order(ticker, quantity, OrderType.LIMIT, OrderAction.BUY, stop_price)
     elif action == "SELL":
         if order_type == "MARKET":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.MARKET, OrderAction.SELL)
+            alex_portfolio.create_market_order(ticker, quantity, OrderType.MARKET, OrderAction.SELL)
         elif order_type == "STOP":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.STOP, OrderAction.SELL, stop_price)
+            alex_portfolio.create_stop_order(ticker, quantity, OrderType.STOP, OrderAction.SELL, stop_price)
         elif order_type == "LIMIT":
-            alex_portfolio.create_market_order(selected_stock, quantity, OrderType.LIMIT, OrderAction.SELL, stop_price)
+            alex_portfolio.create_limit_order(ticker, quantity, OrderType.LIMIT, OrderAction.SELL, stop_price)
 
 
 processor = OrderProcessor(alex_account, alex_portfolio)
@@ -116,8 +105,11 @@ if __name__ == "__main__":
     try:
         while True:
             # This will keep the main thread alive, allowing background threads to run
-            time.sleep(1)
+            # if alex_portfolio.pending_orders:
+            #     time.sleep(5)
+            #     stock_manager.update_stock_prices("DUMMY")
             process_user_input()
+            time.sleep(1)
             
 
     except KeyboardInterrupt:

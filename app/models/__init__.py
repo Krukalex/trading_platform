@@ -7,3 +7,4 @@ from .Trade import Trade
 from .Order import Order, OrderType, OrderStatus, OrderAction
 from .OrderProcessor import OrderProcessor
 from .MarketDataProvider import MarketDataProvider
+from .StockManager import StockManager
