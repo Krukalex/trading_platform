@@ -20,10 +20,19 @@ class StockManager:
             "DUMMY":Stock("Dummy", "Dum", 100)
         }
         self.lock = threading.RLock()
+        self.running = False
 
     def get_stock(self, stock_name:str):
         return self.stock_dict[stock_name.upper()]
     
-    def update_stock_prices(self, ticker):
+    def update_stocks(self):
+        with self.lock:
+            for ticker, stock in self.stock_dict.items():
+                new_price = self.provider.get_stock_price(ticker)
+                stock.set_price(new_price)
+                print(f"Updated {ticker} price to {new_price}")
+        return 
+    
+    def set_stock_price(self, ticker):
         self.stock_dict[ticker].set_price(120)
         return

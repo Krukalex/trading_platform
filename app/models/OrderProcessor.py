@@ -1,5 +1,6 @@
 from app.models.Order import Order, OrderStatus, OrderType, OrderAction
 import threading
+import time
 
 class OrderProcessor:
     def __init__(self, account, portfolio):
@@ -7,6 +8,7 @@ class OrderProcessor:
         self.portfolio = portfolio
         self.lock = self.portfolio.lock
         self.running = True
+        self.thread = None
     
     def process_market_order(self, order:Order):
         if order.action== OrderAction.BUY:
@@ -69,30 +71,33 @@ class OrderProcessor:
     def process_stop_loss(self, order:Order):
         return
     
-    def procces_order_queue(self):
-        def process_queue():
-            to_remove = []
-            with self.lock:
-                orders_copy = list(self.portfolio.pending_orders.items())
-            
-            for identifier, order in orders_copy:
-                if order.order_type == OrderType.STOP:
-                    if order.stock.price > order.stop:
-                        self.process_stop_order(order)
-                        to_remove.append(identifier)
-                if order.order_type == OrderType.LIMIT:
-                    if order.stock.price < order.limit:
-                        self.process_limit_order(order)
+    def process_order_queue(self):
+        to_remove = []
+        with self.lock:
+            orders_copy = list(self.portfolio.pending_orders.items())
         
-        def run_processor(interval = 3):
-            if self.running:
-                process_queue()
-                timer = threading.Timer(interval, run_processor)
-                timer.daemon = True
-                timer.start()
-        
-        run_processor()
-        return
+        for identifier, order in orders_copy:
+            if order.order_type == OrderType.STOP:
+                if order.stock.price > order.stop:
+                    self.process_stop_order(order)
+                    to_remove.append(identifier)
+            if order.order_type == OrderType.LIMIT:
+                if order.stock.price < order.limit:
+                    self.process_limit_order(order)
+    
+    def start_order_processing_queue(self, interval = 10):
+        self.running = True
+
+        def run_processor():
+            while self.running:
+                self.process_order_queue()
+                time.sleep(interval)
+
+        self.thread = threading.Thread(target=run_processor, daemon=True)
+        self.thread.start()
 
     def stop_order_processing_queue(self):
         self.running = False
+        if self.thread:
+            self.thread.join(timeout=5) 
+        print("Order queue processor stopped.")

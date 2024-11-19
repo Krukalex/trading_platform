@@ -87,7 +87,7 @@ def buy_sell_stock():
 
 
 processor = OrderProcessor(alex_account, alex_portfolio)
-processor.procces_order_queue()
+processor.start_order_processing_queue()
 
 def signal_handler(sig, frame):
     # Gracefully stop the application when SIGINT (Ctrl+C) is received
@@ -105,9 +105,8 @@ if __name__ == "__main__":
     try:
         while True:
             # This will keep the main thread alive, allowing background threads to run
-            # if alex_portfolio.pending_orders:
-            #     time.sleep(5)
-            #     stock_manager.update_stock_prices("DUMMY")
+            if alex_portfolio.pending_orders:
+                stock_manager.set_stock_price("DUMMY")
             process_user_input()
             time.sleep(1)
             
