@@ -32,7 +32,6 @@ class StockManager:
             for ticker, stock in self.stock_dict.items():
                 new_price = self.provider.get_stock_price(ticker)
                 stock.set_price(new_price)
-                print(f"Updated {ticker} price to {new_price}")
         return 
     
     def start_stock_updater(self, interval=10):
