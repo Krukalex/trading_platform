@@ -88,11 +88,13 @@ def buy_sell_stock():
 
 processor = OrderProcessor(alex_account, alex_portfolio)
 processor.start_order_processing_queue()
+stock_manager.start_stock_updater()
 
 def signal_handler(sig, frame):
     # Gracefully stop the application when SIGINT (Ctrl+C) is received
     logging.info("Gracefully stopping the application...")
     processor.stop_order_processing_queue()
+    stock_manager.stop_stock_updater()
     exit(0)
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 from app.models.Stock import Stock
 from app.models.MarketDataProvider import MarketDataProvider
 import threading
+import time
 
 class StockManager:
     def __init__(self, interval = 10):
@@ -20,6 +21,7 @@ class StockManager:
             "DUMMY":Stock("Dummy", "Dum", 100)
         }
         self.lock = threading.RLock()
+        self.thread = None
         self.running = False
 
     def get_stock(self, stock_name:str):
@@ -32,6 +34,23 @@ class StockManager:
                 stock.set_price(new_price)
                 print(f"Updated {ticker} price to {new_price}")
         return 
+    
+    def start_stock_updater(self, interval=10):
+        self.running = True
+
+        def run_processor():
+            while self.running:
+                self.update_stocks()
+                time.sleep(interval)
+
+        self.thread = threading.Thread(target=run_processor, daemon=True)
+        self.thread.start()
+
+    def stop_stock_updater(self):
+        self.running = False
+        if self.thread:
+            self.thread.join(timeout=5)
+        print("Stock updater stopped")
     
     def set_stock_price(self, ticker):
         self.stock_dict[ticker].set_price(120)
