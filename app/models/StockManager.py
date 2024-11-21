@@ -17,8 +17,7 @@ class StockManager:
             "NFLX": Stock("Netflix", "NFLX", self.provider.get_stock_price("NFLX")),
             "NVDA": Stock("NVIDIA", "NVDA", self.provider.get_stock_price("NVDA")),
             "AMD": Stock("Advanced Micro Devices", "AMD", self.provider.get_stock_price("AMD")),
-            "INTC": Stock("Intel", "INTC", self.provider.get_stock_price("INTC")),
-            "DUMMY":Stock("Dummy", "Dum", 100)
+            "INTC": Stock("Intel", "INTC", self.provider.get_stock_price("INTC"))
         }
         self.lock = threading.RLock()
         self.thread = None
