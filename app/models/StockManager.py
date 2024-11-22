@@ -38,6 +38,7 @@ class StockManager:
 
         def run_processor():
             while self.running:
+                print("updating stock prices")
                 self.update_stocks()
                 time.sleep(interval)
 
