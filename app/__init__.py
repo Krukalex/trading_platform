@@ -13,10 +13,13 @@ def create_app():
     from .routes.stocks import stock_blueprint
     # from .routes.orders import order_blueprint
     from .routes.login import login_blueprint
+    from .routes.portfolio import portfolio_blueprint
+    from .routes.account import account_blueprint
 
     app.register_blueprint(login_blueprint, url_prefix = '/auth')
     app.register_blueprint(stock_blueprint, url_prefix='/stocks')
-    # app.register_blueprint(order_blueprint, url_prefix='/orders')
+    app.register_blueprint(portfolio_blueprint, url_prefix='/portfolio')
+    app.register_blueprint(account_blueprint, url_prefix = '/account')
 
     stock_manager.start_stock_updater()
 

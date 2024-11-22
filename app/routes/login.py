@@ -7,6 +7,8 @@ from app import stock_manager
 login_blueprint = Blueprint('login', __name__)
 
 active_order_processors = {}
+active_portfolios = {}
+active_account = {}
 
 @login_blueprint.route('/login', methods=['POST'])
 def login():
@@ -28,9 +30,12 @@ def login():
         account = account_db.get(user.user_id)
         if not account:
             return jsonify({"error": "Account not found for user"}), 404
+        
+        active_account[user.user_id] = account
 
         # Create portfolio and start order processing
         portfolio = Portfolio(account, stock_manager)
+        active_portfolios[user.user_id] = portfolio
         order_processor = OrderProcessor(account, portfolio)
         order_processor.start_order_processing_queue()
         active_order_processors[user.user_id] = order_processor
