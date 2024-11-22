@@ -33,6 +33,7 @@ class Account:
     def deposit(self, amount:float):
         if amount <= 0:
             print("Deposit amount must be greater than zero.")
+            return False
         else:
             self.add_balance(amount)
 
@@ -43,6 +44,7 @@ class Account:
             )
             self.transaction_history.append(transaction)
             print(f"Deposited {amount}. New balance: {self.get_balance()}")
+            return True
             
     def withdraw(self, amount:float, fee:float = 2):
         if (amount+fee)>self.get_balance():

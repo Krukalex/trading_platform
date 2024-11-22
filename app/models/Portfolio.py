@@ -2,7 +2,6 @@ from app.models import Account, Stock, StockManager
 from app.models.Trade import Trade
 from app.models.Order import Order, OrderType, OrderAction, MarketOrder, StopOrder, LimitOrder
 from app.models.OrderProcessor import OrderProcessor
-import threading
 
 import uuid
 
