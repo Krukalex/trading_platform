@@ -1,14 +1,12 @@
 from flask import Blueprint, jsonify
-from app.models.StockManager import StockManager
+from app import stock_manager
 
 stock_blueprint = Blueprint("stocks", __name__)
-
-stock_manager = StockManager()
 
 @stock_blueprint.route('/')
 def get_all_stocks():
     stocks = stock_manager.stock_dict
-    stocks = {ticker: stock.company_name for ticker, stock in stock_manager.stock_dict.items()}
+    stocks = {ticker: {"Company": stock.company_name, "Price":stock.get_price()} for ticker, stock in stock_manager.stock_dict.items()}
     return jsonify(stocks)
 
 @stock_blueprint.route('/<ticker>')

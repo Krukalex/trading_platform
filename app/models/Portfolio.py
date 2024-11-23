@@ -40,13 +40,10 @@ class Portfolio:
             return False
 
         if stock.ticker in self.holdings:
-            self.holdings[stock.ticker]["value"]+=total_price
             self.holdings[stock.ticker]["quantity"]+=quantity
         else:
-            self.holdings[stock.ticker]= {
-                "value": total_price,
-                "quantity": quantity
-            }
+            self.holdings[stock.ticker]= {"quantity": quantity}
+
         self.add_value(total_price)
 
         self.account.apply_trade_fee(total_price)
@@ -74,7 +71,6 @@ class Portfolio:
             print(f"You are attempting to sells {quantity} shares of {stock.ticker}, but you only are holding {self.holdings[stock.ticker]['quantity']} shares. This sale is invalid")
             return False
         else:
-            self.holdings[stock.ticker]["value"]-=(total_profit)
             self.holdings[stock.ticker]["quantity"]-=quantity
 
         self.deduct_value(total_profit)
@@ -106,8 +102,7 @@ class Portfolio:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         print(f"created a market order to {action.name} {quantity} shares of {stock.ticker}")
-        processor.process_market_order(order)
-        return True
+        return processor.process_market_order(order)
 
     def create_stop_order(self, ticker:str, quantity:int, order_type:OrderType, action:OrderAction, stop:float):
         stock = self.stock_manager.get_stock(ticker)
@@ -123,8 +118,7 @@ class Portfolio:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         print(f"created a stop  order to {action.name} {quantity} shares of {stock.ticker} with a stop set at {stop}")
-        processor.process_stop_order(order)
-        return True
+        return processor.process_stop_order(order)
 
     def create_limit_order(self, ticker:str, quantity:int, order_type:OrderType, action:OrderAction, limit:float):
         stock = self.stock_manager.get_stock(ticker)
@@ -140,8 +134,15 @@ class Portfolio:
             self.pending_orders[order.order_id] = order
         processor = OrderProcessor(self.account, self)
         print(f"created a limit order to {action.name} {quantity} shares of {stock.ticker} with a limit set at {limit}")
-        processor.process_limit_order(order)
-        return True
+        return processor.process_limit_order(order)
 
     def get_holdings(self):
-        print(self.holdings)
+        holdings_summary = {}
+        for ticker, data in self.holdings.items():
+            price = self.stock_manager.get_stock(ticker).price
+            holdings_summary[ticker]={
+                "Quantity":data["quantity"],
+                "Price": price,
+                "Total Value": data["quantity"]*price
+            }
+        return holdings_summary
