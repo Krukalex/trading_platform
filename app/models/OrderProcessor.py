@@ -22,7 +22,7 @@ class OrderProcessor:
             return True
         else:
             print("market order could not be completed")
-        return False
+            return False
     
     def process_stop_order(self, order:Order):
         if order.action == OrderAction.BUY:
