@@ -52,21 +52,19 @@ class OrderProcessor:
             if order.stock.get_price()<=order.limit:
                 result = self.portfolio.buy_stock(order.stock, order.quantity)
             else:
-                result = None
                 print("Buy limit order not executed since stock price was above the limit price")
+                return 'ORDER_CREATED'
         elif order.action == OrderAction.SELL:
             if order.stock.get_price()>=order.limit:
                 result = self.portfolio.buy_stock(order.stock, order.quantity)
             else:
-                result = None
                 print("Sell limit order not executed since stock price was below the limit price")
-        if result:
-            order.set_status(OrderStatus.FILLED)
-            with self.lock:
-                del self.portfolio.pending_orders[order.order_id]
-                print(f"Deleted order {order.order_id}. Remaining orders: {self.portfolio.pending_orders}")
-            return True
-        return False
+                return "ORDER_CREATED"
+        order.set_status(OrderStatus.FILLED)
+        with self.lock:
+            del self.portfolio.pending_orders[order.order_id]
+            print(f"Deleted order {order.order_id}. Remaining orders: {self.portfolio.pending_orders}")
+        return True
     
     def process_stop_loss(self, order:Order):
         return

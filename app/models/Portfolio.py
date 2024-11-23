@@ -146,3 +146,17 @@ class Portfolio:
                 "Total Value": data["quantity"]*price
             }
         return holdings_summary
+    
+    def get_pending_orders(self):
+        order_summary = {}
+        for order_id, order in self.pending_orders.items():
+            stock = order.stock
+            price = self.stock_manager.get_stock(stock.ticker).price
+            order_summary[str(order_id)] = {
+                "Ticker": stock.ticker,
+                "Price": price,
+                "Quantity": order.quantity,
+                "Action": str(order.action.name),
+                "Status": str(order.status.name)
+            }
+        return order_summary
