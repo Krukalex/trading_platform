@@ -1,7 +1,9 @@
 import datetime
+import uuid
 
 class Transaction:
     def __init__(self, amount:float, trans_type:str, fee:float = 0, new_balance:float = 0):
+        self.trans_id = uuid.uuid4()
         self.amount = amount
         self.trans_type = trans_type
         self.fee = fee

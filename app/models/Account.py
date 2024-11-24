@@ -60,6 +60,7 @@ class Account:
             )
             self.transaction_history.append(transaction)
             print(f"Withdrew {amount}. Fee of {fee} was deducted. New balance: {self.get_balance()}")
+            return True
 
     def transfer(self, destination:"Account", amount:float, fee:float = 2):
         if (amount+fee)>self.get_balance():
@@ -104,15 +105,43 @@ class Account:
 
     def get_transaction_history(self):
         print(f"Transaction history for {self.user_id}")
-        for transaction in self.transaction_history:
-            print(transaction)
+        transaction_history_summary = {}
+        for trans in self.transaction_history:
+            transaction_history_summary[str(trans.trans_id)] = {
+                "Type":trans.trans_type,
+                "Amount":trans.amount,
+                "Fee":trans.fee,
+                "New Balance":trans.new_balance,
+                "Timestamp":trans.timestamp
+            }
+        return transaction_history_summary
         
     def get_trade_history(self):
         print(f"Trade history for {self.user_id}")
+        trade_history_summary = {}
         for trade in self.trade_history:
-            print(trade)
+            trade_history_summary[str(trade.trade_id)]={
+                "Type": trade.trade_type,
+                "Stock":trade.stock.ticker,
+                "Quantity":trade.quantity,
+                "Fee":trade.trade_fee,
+                "Cost":trade.cost,
+                "New Balance":trade.new_balance,
+                "Timestamp": trade.timestamp
+            }
+        return trade_history_summary
         
     def get_order_history(self):
         print(f"Order history for {self.account_id}")
+        order_history_summary = {}
         for order in self.order_history.values():
-            print(order)
+            order_history_summary[str(order.order_id)] = {
+                "Type": str(order.order_type.name),
+                "Action": str(order.action.name),
+                "Stock": order.stock.ticker,
+                "Quantity": order.quantity,
+                "Status": str(order.status.name),
+                "Created at": order.created_at
+            }
+        print(order_history_summary)
+        return order_history_summary

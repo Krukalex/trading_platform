@@ -36,8 +36,8 @@ class Portfolio:
         trade_fee = round(total_price * self.account.trade_fee_rate,2)
 
         if total_price+trade_fee>self.account.get_balance():
-            print(f"Insufficent funds, attempting to make purches for {total_price}. Account balance is {self.account.get_balance()}")
-            return False
+            print(f"Insufficient funds, attempting to make purchase for {total_price}. Account balance is {self.account.get_balance()}")
+            return "INSUFFICIENT_FUNDS"
 
         if stock.ticker in self.holdings:
             self.holdings[stock.ticker]["quantity"]+=quantity
@@ -66,12 +66,14 @@ class Portfolio:
 
         if stock.ticker not in self.holdings:
             print(f"You do not currently own {stock.company_name} stock. This sale is invalid")
-            return False
+            return "NOT_HOLDING"
         elif quantity>self.holdings[stock.ticker]['quantity']:
             print(f"You are attempting to sells {quantity} shares of {stock.ticker}, but you only are holding {self.holdings[stock.ticker]['quantity']} shares. This sale is invalid")
-            return False
+            return "QUANTITY_TOO_HIGH"
         else:
             self.holdings[stock.ticker]["quantity"]-=quantity
+            if self.holdings[stock.ticker]["quantity"]==0:
+                del self.holdings[stock.ticker]
 
         self.deduct_value(total_profit)
 
@@ -155,8 +157,13 @@ class Portfolio:
             order_summary[str(order_id)] = {
                 "Ticker": stock.ticker,
                 "Price": price,
+                "Type": str(order.order_type.name),
                 "Quantity": order.quantity,
                 "Action": str(order.action.name),
                 "Status": str(order.status.name)
             }
+            if order.order_type == OrderType.STOP:
+                order_summary[str(order_id)]["Stop"] = order.stop
+            if order.order_type == OrderType.LIMIT:
+                order_summary[str(order_id)]["Limit"] = order.limit
         return order_summary
