@@ -143,5 +143,4 @@ class Account:
                 "Status": str(order.status.name),
                 "Created at": order.created_at
             }
-        print(order_history_summary)
         return order_history_summary
